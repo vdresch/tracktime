@@ -12,6 +12,8 @@ class TrackTimeView extends WatchUi.DataField {
     hidden var lap_trigger as Boolean;
     hidden var split_in_seconds as Numeric;
     hidden var split_laps as Numeric;
+    hidden var current_step_workout;
+    hidden var skip_step as Boolean;
 
     hidden var timer_display;
     hidden var vibeData;
@@ -21,6 +23,7 @@ class TrackTimeView extends WatchUi.DataField {
 
         split_laps = 1;
         lap_trigger = false;
+        skip_step = false;
 
         vibeData =  [
                         new Attention.VibeProfile(25, 2000),
@@ -42,8 +45,6 @@ class TrackTimeView extends WatchUi.DataField {
         split_in_seconds = pace_in_seconds / (1000/split_distance);
     }
 
-    // Set your layout here. Anytime the size of obscurity of
-    // the draw context is changed this will be called.
     function onLayout(dc as Dc) as Void {
         var obscurityFlags = DataField.getObscurityFlags();
 
@@ -79,8 +80,25 @@ class TrackTimeView extends WatchUi.DataField {
         lap_trigger = true;
     }
 
+    function onWorkoutStepComplete() as Void {
+        lap_trigger = true;
+    }
+
     function compute(info) as Void {
-        // See Activity.Info in the documentation for available information.
+
+        current_step_workout = Activity.getCurrentWorkoutStep();
+
+        if (current_step_workout != null)
+        {
+            if(current_step_workout.intensity == 0)
+            {
+                skip_step = false;
+            }
+            else {
+                skip_step = true;
+            }
+        }
+
         if (lap_trigger) {
             lap_trigger = false;
             last_lap = info.timerTime;
@@ -89,7 +107,7 @@ class TrackTimeView extends WatchUi.DataField {
 
         timer = info.timerTime - last_lap;
 
-        if ((timer/1000 )>= (split_in_seconds * split_laps)) {
+        if (((timer/1000 )>= (split_in_seconds * split_laps)) & !skip_step) {
             System.println("100m");
             Attention.vibrate(vibeData);
             split_laps = split_laps + 1;
@@ -129,8 +147,6 @@ class TrackTimeView extends WatchUi.DataField {
         } 
 
         value.setText(timer_display);
-
-        System.println(timer);
 
         // Call parent's onUpdate(dc) to redraw the layout
         View.onUpdate(dc);
