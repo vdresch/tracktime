@@ -1,0 +1,13 @@
+<resources>
+    <properties>
+
+        <!-- Pace -->
+        <property id="pace" type="number">300</property>
+
+        <!-- Split distance -->
+        <property id="split" type="number">100</property>
+
+
+    </properties>
+        
+</resources>

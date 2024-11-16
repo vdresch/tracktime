@@ -1,3 +1,4 @@
+using Toybox.Application as App;
 import Toybox.Activity;
 import Toybox.Graphics;
 import Toybox.Lang;
@@ -31,16 +32,8 @@ class TrackTimeView extends WatchUi.DataField {
                         new Attention.VibeProfile(100, 2000)
                     ];
 
-        var pace = "2:10";
-        var split_distance = 100;
-
-        var colonIndex = pace.find(":");
-        var minutesStr = pace.substring(0, colonIndex);
-        var secondsStr = pace.substring(colonIndex + 1, colonIndex + 3);
-        var minutes = minutesStr.toNumber();
-        var seconds = secondsStr.toNumber();
-
-        var pace_in_seconds = (minutes * 60) + seconds;
+        var pace_in_seconds = App.getApp().getProperty("pace");
+        var split_distance = App.getApp().getProperty("split");
 
         split_in_seconds = pace_in_seconds / (1000/split_distance);
     }
