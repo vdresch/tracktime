@@ -1,3 +1,5 @@
 <strings>
     <string id="AppName">TrackTime</string>
+
+    <string id="label">My Value</string>
 </strings>

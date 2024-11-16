@@ -16,7 +16,7 @@ class TrackTimeApp extends Application.AppBase {
     function onStop(state as Dictionary?) as Void {
     }
 
-    // Return the initial view of your application here
+    //! Return the initial view of your application here
     function getInitialView() as [Views] or [Views, InputDelegates] {
         return [ new TrackTimeView() ];
     }
