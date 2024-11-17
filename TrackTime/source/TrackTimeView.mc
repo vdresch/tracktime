@@ -54,7 +54,7 @@ class TrackTimeView extends WatchUi.DataField {
         } else if (obscurityFlags == (OBSCURE_BOTTOM | OBSCURE_RIGHT)) {
             View.setLayout(Rez.Layouts.BottomRightLayout(dc));
         } else {
-            View.setLayout(Rez.Layouts.MainLayout_1_field(dc));
+            View.setLayout(Rez.Layouts.MainLayout(dc));
             var labelView = View.findDrawableById("label") as Text;
             labelView.locY = labelView.locY - 28;
             var valueView = View.findDrawableById("value") as Text;
