@@ -15,7 +15,7 @@ class TrackTimeView extends WatchUi.DataField {
     hidden var split_laps as Numeric;
     hidden var current_step_workout;
     hidden var skip_step as Boolean;
-
+    hidden var running_laps = 0;
     hidden var timer_display;
     hidden var vibeData;
 
@@ -26,16 +26,13 @@ class TrackTimeView extends WatchUi.DataField {
         lap_trigger = false;
         skip_step = false;
 
-        vibeData =  [
-                        new Attention.VibeProfile(25, 2000),
-                        new Attention.VibeProfile(50, 2000),
-                        new Attention.VibeProfile(100, 2000)
-                    ];
+        vibeData =  [new Attention.VibeProfile(100, 650)];
 
         var pace_in_seconds = App.getApp().getProperty("pace");
         var split_distance = App.getApp().getProperty("split");
 
         split_in_seconds = pace_in_seconds / (1000/split_distance);
+
     }
 
     function onLayout(dc as Dc) as Void {
@@ -56,14 +53,12 @@ class TrackTimeView extends WatchUi.DataField {
         // Bottom right quadrant so we'll use the bottom right layout
         } else if (obscurityFlags == (OBSCURE_BOTTOM | OBSCURE_RIGHT)) {
             View.setLayout(Rez.Layouts.BottomRightLayout(dc));
-
-        // Use the generic, centered layout
         } else {
-            View.setLayout(Rez.Layouts.MainLayout(dc));
+            View.setLayout(Rez.Layouts.MainLayout_1_field(dc));
             var labelView = View.findDrawableById("label") as Text;
-            labelView.locY = labelView.locY - 16;
+            labelView.locY = labelView.locY - 28;
             var valueView = View.findDrawableById("value") as Text;
-            valueView.locY = valueView.locY + 7;
+            valueView.locY = valueView.locY + 13;
         }
 
         (View.findDrawableById("label") as Text).setText(Rez.Strings.label);
@@ -93,17 +88,27 @@ class TrackTimeView extends WatchUi.DataField {
         }
 
         if (lap_trigger) {
+
+            if (current_step_workout != null)
+            {
+                if(current_step_workout.intensity == 0)
+                {
+                    running_laps++;
+                }
+            }
+
             lap_trigger = false;
             last_lap = info.timerTime;
             split_laps = 1;
         }
 
+
         timer = info.timerTime - last_lap;
 
-        if (((timer/1000 )>= (split_in_seconds * split_laps)) & !skip_step) {
+        if ((((timer+400)/1000 )>= (split_in_seconds * split_laps)) & !skip_step) {
             System.println("100m");
             Attention.vibrate(vibeData);
-            split_laps = split_laps + 1;
+            split_laps++;
         }
     }
 
@@ -123,7 +128,7 @@ class TrackTimeView extends WatchUi.DataField {
         if (timer != null && timer > 0) {
             var hours = null;
             var minutes = timer / 1000 / 60;
-            var seconds = (timer+100) / 1000 % 60;
+            var seconds = (timer+300) / 1000 % 60;
             
             if (minutes >= 60) {
                 hours = minutes / 60;
@@ -138,6 +143,8 @@ class TrackTimeView extends WatchUi.DataField {
         } else {
             timer_display = "0:00";
         } 
+
+        //value.setText(timer.toString());
 
         value.setText(timer_display);
 
