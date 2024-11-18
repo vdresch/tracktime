@@ -26,7 +26,7 @@ class TrackTimeView extends WatchUi.DataField {
 
         vibeData =  [new Attention.VibeProfile(100, 750)];
 
-        var pace_in_seconds = App.getApp().getProperty("pace");
+        var pace_in_seconds = 300;//App.getApp().getProperty("pace");
         var split_distance = App.getApp().getProperty("split");
 
         split_in_seconds = pace_in_seconds / (1000/split_distance);
@@ -103,8 +103,7 @@ class TrackTimeView extends WatchUi.DataField {
 
         timer = info.timerTime - last_lap;
 
-        if ((((timer+400)/1000 )>= (split_in_seconds * split_laps)) & !skip_step) {
-            System.println("100m");
+        if ((((timer+500)/1000 )>= (split_in_seconds * split_laps)) & !skip_step) {
             Attention.vibrate(vibeData);
             split_laps++;
         }
@@ -122,11 +121,14 @@ class TrackTimeView extends WatchUi.DataField {
             value.setColor(Graphics.COLOR_BLACK);
         }
 
+        var info = Activity.getActivityInfo();
+        timer = info.timerTime - last_lap;
+
         // Format time
         if (timer != null && timer > 0) {
             var hours = null;
             var minutes = timer / 1000 / 60;
-            var seconds = (timer+300) / 1000 % 60;
+            var seconds = (timer+500) / 1000 % 60;
             
             if (minutes >= 60) {
                 hours = minutes / 60;
