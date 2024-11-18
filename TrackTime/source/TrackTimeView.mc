@@ -10,7 +10,6 @@ class TrackTimeView extends WatchUi.DataField {
 
     hidden var timer = 0;
     hidden var last_lap = 0;
-    hidden var lap_trigger as Boolean;
     hidden var split_in_seconds as Numeric;
     hidden var split_laps as Numeric;
     hidden var current_step_workout;
@@ -23,10 +22,9 @@ class TrackTimeView extends WatchUi.DataField {
         DataField.initialize();
 
         split_laps = 1;
-        lap_trigger = false;
         skip_step = false;
 
-        vibeData =  [new Attention.VibeProfile(100, 650)];
+        vibeData =  [new Attention.VibeProfile(100, 750)];
 
         var pace_in_seconds = App.getApp().getProperty("pace");
         var split_distance = App.getApp().getProperty("split");
@@ -64,12 +62,28 @@ class TrackTimeView extends WatchUi.DataField {
         (View.findDrawableById("label") as Text).setText(Rez.Strings.label);
     }
 
+    function reset_timer() as Void {
+
+        var info = Activity.getActivityInfo();
+
+        if (current_step_workout != null)
+        {
+            if(current_step_workout.intensity == 0)
+            {
+                running_laps++;
+            }
+        }
+
+        last_lap = info.timerTime;
+        split_laps = 1;
+    }
+
     function onTimerLap() as Void {
-        lap_trigger = true;
+        reset_timer();
     }
 
     function onWorkoutStepComplete() as Void {
-        lap_trigger = true;
+        reset_timer();
     }
 
     function compute(info) as Void {
@@ -86,22 +100,6 @@ class TrackTimeView extends WatchUi.DataField {
                 skip_step = true;
             }
         }
-
-        if (lap_trigger) {
-
-            if (current_step_workout != null)
-            {
-                if(current_step_workout.intensity == 0)
-                {
-                    running_laps++;
-                }
-            }
-
-            lap_trigger = false;
-            last_lap = info.timerTime;
-            split_laps = 1;
-        }
-
 
         timer = info.timerTime - last_lap;
 
