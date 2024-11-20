@@ -26,9 +26,11 @@ class TrackTimeView extends WatchUi.DataField {
 
         vibeData =  [new Attention.VibeProfile(100, 750)];
 
-        var pace_in_seconds = 300;//App.getApp().getProperty("pace");
+        // Gets pace and split info from user
+        var pace_in_seconds = App.getApp().getProperty("pace");
         var split_distance = App.getApp().getProperty("split");
 
+        // Turns pace (in seconds) to time intervals based on the split distance
         split_in_seconds = pace_in_seconds / (1000/split_distance);
 
     }
@@ -62,6 +64,7 @@ class TrackTimeView extends WatchUi.DataField {
         (View.findDrawableById("label") as Text).setText(Rez.Strings.label);
     }
 
+    // Resets timer if there is a lap or the workout step is completed
     function reset_timer() as Void {
 
         var info = Activity.getActivityInfo();
@@ -78,10 +81,12 @@ class TrackTimeView extends WatchUi.DataField {
         split_laps = 1;
     }
 
+    // Function called lap button is pressed. Resets timer
     function onTimerLap() as Void {
         reset_timer();
     }
 
+    // Function called once workout step is completed. Resets timer
     function onWorkoutStepComplete() as Void {
         reset_timer();
     }
@@ -90,6 +95,7 @@ class TrackTimeView extends WatchUi.DataField {
 
         current_step_workout = Activity.getCurrentWorkoutStep();
 
+        // Sets flag so buzzer skips non running steps (warm up and cool down as well)
         if (current_step_workout != null)
         {
             if(current_step_workout.intensity == 0)
@@ -103,6 +109,7 @@ class TrackTimeView extends WatchUi.DataField {
 
         timer = info.timerTime - last_lap;
 
+        // Buzz if it's time to buzz. Adds 1 to split_laps so it buzzes only on the next split.
         if ((((timer+500)/1000 )>= (split_in_seconds * split_laps)) & !skip_step) {
             Attention.vibrate(vibeData);
             split_laps++;
@@ -144,7 +151,11 @@ class TrackTimeView extends WatchUi.DataField {
             timer_display = "0:00";
         } 
 
-        //value.setText(timer.toString());
+        // Buzz if it's time to buzz. Adds 1 to split_laps so it buzzes only on the next split.
+        if ((((timer+500)/1000 )>= (split_in_seconds * split_laps)) & !skip_step) {
+            Attention.vibrate(vibeData);
+            split_laps++;
+        }
 
         value.setText(timer_display);
 

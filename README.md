@@ -9,9 +9,9 @@ Lap Timer: View a running lap timer on your watch display for real-time progress
 Workout Integration: Automatically buzz only during the run segments of your structured Garmin workouts.
 
 ### Getting Started
-Installation
-Download and install the TrackTime app from the Garmin Connect IQ Store.
+Download and install the TrackTime app for free from the Garmin Connect IQ Store (coming soon). Or just download the TrackTime.prg and transfer manually to the Apps folder in the watch.
 Ensure that your Garmin device is compatible with the app.
+
 
 ### Usage
 On the run settings, you must add the Data Field to a Data Screen. The pace and split distances can be customized on the Connect IQ phone app.
