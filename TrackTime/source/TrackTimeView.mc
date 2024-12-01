@@ -8,15 +8,18 @@ import Toybox.Math;
 
 class TrackTimeView extends WatchUi.DataField {
 
-    hidden var timer = 0;
-    hidden var last_lap = 0;
-    hidden var split_in_seconds as Numeric;
-    hidden var split_laps as Numeric;
-    hidden var current_step_workout;
-    hidden var skip_step as Boolean;
-    hidden var running_laps = 0;
-    hidden var timer_display;
-    hidden var vibeData;
+    var timer = 0;
+    var timer_aux = 0;
+    var last_lap = 0;
+    var split_in_seconds as Numeric;
+    var split_laps as Numeric;
+    var current_step_workout;
+    var skip_step as Boolean;
+    var running_laps = 0;
+    var timer_display;
+    var last_lap_display;
+    var show_last_lap = false;
+    var vibeData;
 
     function initialize() {
         DataField.initialize();
@@ -56,9 +59,13 @@ class TrackTimeView extends WatchUi.DataField {
         } else {
             View.setLayout(Rez.Layouts.MainLayout(dc));
             var labelView = View.findDrawableById("label") as Text;
-            labelView.locY = labelView.locY - 28;
+            labelView.locY = labelView.locY - 32;
             var valueView = View.findDrawableById("value") as Text;
             valueView.locY = valueView.locY + 13;
+            var valueView2 = View.findDrawableById("value2") as Text;
+            valueView2.locY = valueView2.locY + 17;
+            (View.findDrawableById("label2") as Text).setText(Rez.Strings.label2);
+            show_last_lap = true;
         }
 
         (View.findDrawableById("label") as Text).setText(Rez.Strings.label);
@@ -77,7 +84,8 @@ class TrackTimeView extends WatchUi.DataField {
             }
         }
 
-        last_lap = info.timerTime;
+        last_lap = info.timerTime - timer_aux;
+        timer_aux = info.timerTime;
         split_laps = 1;
     }
 
@@ -107,7 +115,7 @@ class TrackTimeView extends WatchUi.DataField {
             }
         }
 
-        timer = info.timerTime - last_lap;
+        timer = info.timerTime - timer_aux;
 
         // Buzz if it's time to buzz. Adds 1 to split_laps so it buzzes only on the next split.
         if ((((timer+500)/1000 )>= (split_in_seconds * split_laps)) & !skip_step) {
@@ -127,11 +135,17 @@ class TrackTimeView extends WatchUi.DataField {
         } else {
             value.setColor(Graphics.COLOR_BLACK);
         }
+        var value2 = View.findDrawableById("value2") as Text;
+        if (getBackgroundColor() == Graphics.COLOR_BLACK) {
+            value2.setColor(Graphics.COLOR_WHITE);
+        } else {
+            value2.setColor(Graphics.COLOR_BLACK);
+        }
 
         var info = Activity.getActivityInfo();
-        timer = info.timerTime - last_lap;
+        timer = info.timerTime - timer_aux;
 
-        // Format time
+        // Format and show timer
         if (timer != null && timer > 0) {
             var hours = null;
             var minutes = timer / 1000 / 60;
@@ -149,15 +163,40 @@ class TrackTimeView extends WatchUi.DataField {
             }
         } else {
             timer_display = "0:00";
-        } 
+        }
+         
+        value.setText(timer_display);
+
+        // Shows last lap
+
+        System.println(last_lap);
+
+        if (last_lap != null && last_lap > 0 && show_last_lap) {
+            var hours = null;
+            var minutes = last_lap / 1000 / 60;
+            var seconds = (last_lap+500) / 1000 % 60;
+            
+            if (minutes >= 60) {
+                hours = minutes / 60;
+                minutes = minutes % 60;
+            }
+            
+            if (hours == null) {
+                last_lap_display = minutes.format("%d") + ":" + seconds.format("%02d");
+            } else {
+                last_lap_display = hours.format("%d") + ":" + minutes.format("%02d") + ":" + seconds.format("%02d");
+            }
+        } else {
+            last_lap_display = "No Laps";
+        }
+
+        value2.setText(last_lap_display);
 
         // Buzz if it's time to buzz. Adds 1 to split_laps so it buzzes only on the next split.
         if ((((timer+500)/1000 )>= (split_in_seconds * split_laps)) & !skip_step) {
             Attention.vibrate(vibeData);
             split_laps++;
         }
-
-        value.setText(timer_display);
 
         // Call parent's onUpdate(dc) to redraw the layout
         View.onUpdate(dc);

@@ -2,4 +2,5 @@
     <string id="AppName">TrackTime</string>
 
     <string id="label">Lap Time</string>
+    <string id="label2">Last Lap</string>
 </strings>

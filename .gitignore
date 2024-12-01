@@ -3,3 +3,4 @@ internal-mir
 mir
 *.json
 *.xml
+*.prg
