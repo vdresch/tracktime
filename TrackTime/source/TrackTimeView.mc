@@ -41,21 +41,14 @@ class TrackTimeView extends WatchUi.DataField {
     function onLayout(dc as Dc) as Void {
         var obscurityFlags = DataField.getObscurityFlags();
 
-        // Top left quadrant so we'll use the top left layout
-        if (obscurityFlags == (OBSCURE_TOP | OBSCURE_LEFT)) {
-            View.setLayout(Rez.Layouts.TopLeftLayout(dc));
-
-        // Top right quadrant so we'll use the top right layout
-        } else if (obscurityFlags == (OBSCURE_TOP | OBSCURE_RIGHT)) {
-            View.setLayout(Rez.Layouts.TopRightLayout(dc));
-
-        // Bottom left quadrant so we'll use the bottom left layout
-        } else if (obscurityFlags == (OBSCURE_BOTTOM | OBSCURE_LEFT)) {
-            View.setLayout(Rez.Layouts.BottomLeftLayout(dc));
-
-        // Bottom right quadrant so we'll use the bottom right layout
-        } else if (obscurityFlags == (OBSCURE_BOTTOM | OBSCURE_RIGHT)) {
-            View.setLayout(Rez.Layouts.BottomRightLayout(dc));
+        // If not full screen
+        if (obscurityFlags != 15) {
+            View.setLayout(Rez.Layouts.SmallLayout(dc));
+            var labelView = View.findDrawableById("label") as Text;
+            labelView.locY = labelView.locY - 32;
+            var valueView = View.findDrawableById("value") as Text;
+            valueView.locY = valueView.locY + 25;
+            show_last_lap = false;
         } else {
             View.setLayout(Rez.Layouts.MainLayout(dc));
             var labelView = View.findDrawableById("label") as Text;
@@ -135,12 +128,6 @@ class TrackTimeView extends WatchUi.DataField {
         } else {
             value.setColor(Graphics.COLOR_BLACK);
         }
-        var value2 = View.findDrawableById("value2") as Text;
-        if (getBackgroundColor() == Graphics.COLOR_BLACK) {
-            value2.setColor(Graphics.COLOR_WHITE);
-        } else {
-            value2.setColor(Graphics.COLOR_BLACK);
-        }
 
         var info = Activity.getActivityInfo();
         timer = info.timerTime - timer_aux;
@@ -168,29 +155,37 @@ class TrackTimeView extends WatchUi.DataField {
         value.setText(timer_display);
 
         // Shows last lap
+        if (show_last_lap) {
 
-        System.println(last_lap);
-
-        if (last_lap != null && last_lap > 0 && show_last_lap) {
-            var hours = null;
-            var minutes = last_lap / 1000 / 60;
-            var seconds = (last_lap+500) / 1000 % 60;
-            
-            if (minutes >= 60) {
-                hours = minutes / 60;
-                minutes = minutes % 60;
-            }
-            
-            if (hours == null) {
-                last_lap_display = minutes.format("%d") + ":" + seconds.format("%02d");
+            var value2 = View.findDrawableById("value2") as Text;
+            if (getBackgroundColor() == Graphics.COLOR_BLACK) {
+                value2.setColor(Graphics.COLOR_WHITE);
             } else {
-                last_lap_display = hours.format("%d") + ":" + minutes.format("%02d") + ":" + seconds.format("%02d");
+                value2.setColor(Graphics.COLOR_BLACK);
             }
-        } else {
-            last_lap_display = "No Laps";
-        }
+            
+            if (last_lap != null && last_lap > 0) {
 
-        value2.setText(last_lap_display);
+                var hours = null;
+                var minutes = last_lap / 1000 / 60;
+                var seconds = (last_lap+500) / 1000 % 60;
+                
+                if (minutes >= 60) {
+                    hours = minutes / 60;
+                    minutes = minutes % 60;
+                }
+                
+                if (hours == null) {
+                    last_lap_display = minutes.format("%d") + ":" + seconds.format("%02d");
+                } else {
+                    last_lap_display = hours.format("%d") + ":" + minutes.format("%02d") + ":" + seconds.format("%02d");
+                }
+            } else {
+                last_lap_display = "No Laps";
+            }
+            
+            value2.setText(last_lap_display);
+        }
 
         // Buzz if it's time to buzz. Adds 1 to split_laps so it buzzes only on the next split.
         if ((((timer+500)/1000 )>= (split_in_seconds * split_laps)) & !skip_step) {
