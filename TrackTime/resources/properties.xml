@@ -7,6 +7,8 @@
         <!-- Split distance -->
         <property id="split" type="number">100</property>
 
+        <!-- Only work during workouts -->
+        <property id="workout_only" type="number">0</property>
 
     </properties>
         

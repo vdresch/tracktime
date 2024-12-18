@@ -25,7 +25,7 @@ class TrackTimeView extends WatchUi.DataField {
         DataField.initialize();
 
         split_laps = 1;
-        skip_step = false;
+        skip_step = App.getApp().getProperty("workout_only") == 1;
 
         vibeData =  [new Attention.VibeProfile(100, 750)];
 
